@@ -1,0 +1,12 @@
+# Rust build output
+/target
+
+# Environment / secrets — NEVER commit these
+.env
+.env.*
+*.pem
+*.key
+
+# Editor cruft
+*.swp
+.DS_Store

@@ -1,0 +1,49 @@
+name: CI
+
+# Run on every PR into main, and on pushes to main itself.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Cancel an in-progress run if you push again to the same branch —
+# saves CI minutes when you push twice in quick succession.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  ci:
+    name: fmt + clippy + test
+    runs-on: ubuntu-latest
+    steps:
+      # Pull the repo's code onto the runner.
+      - uses: actions/checkout@v6
+
+      # Install the stable Rust toolchain, plus the two extra
+      # components the checks below need (they aren't in the base toolchain).
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      # Cache ~/.cargo and target/ keyed on Cargo.lock, so later
+      # runs reuse compiled dependencies instead of rebuilding from scratch.
+      - uses: Swatinem/rust-cache@v2
+
+      # 1. Formatting: fails if any file isn't rustfmt-clean. --check
+      #    only reports, never edits.
+      - name: Format
+        run: cargo fmt --all --check
+
+      # 2. Lint: -D warnings promotes every clippy warning to a hard
+      #    error, so sloppy-but-compiling code can't merge.
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      # 3. Tests across the whole workspace (lab_1 now, future labs later).
+      - name: Test
+        run: cargo test --workspace

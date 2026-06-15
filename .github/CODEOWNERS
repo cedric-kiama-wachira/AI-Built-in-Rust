@@ -1,0 +1,8 @@
+# CODEOWNERS for AI-Built-in-Rust
+# Last matching pattern wins. Every owner needs WRITE access.
+
+# Default: whole repo co-owned
+*                  @cedric-kiama-wachira @digital-factory-dm
+
+# CI/CD/CT pipelines (placeholder for later) — tightest review here
+/.github/          @cedric-kiama-wachira @digital-factory-dm
